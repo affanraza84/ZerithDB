@@ -1,7 +1,7 @@
 {
-  "name": "zerithdb-db",
+  "name": "zerithdb-auth-auth0",
   "version": "0.2.0",
-  "description": "Local-first IndexedDB engine for ZerithDB — MongoDB-style API over Dexie",
+  "description": "Auth0 integration for ZerithDB peer identities",
   "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -17,26 +17,21 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
-    "test": "vitest run --passWithNoTests",
-    "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "dexie": "^4.0.8",
-    "uuid": "^10.0.0",
+    "@auth0/auth0-spa-js": "^2.1.0",
+    "zerithdb-auth": "workspace:*",
     "zerithdb-core": "workspace:*"
   },
   "devDependencies": {
-    "@types/uuid": "^10.0.0",
-    "fake-indexeddb": "^6.0.0",
-    "happy-dom": "^20.9.0",
+    "zerithdb-eslint-config": "workspace:*",
+    "zerithdb-tsconfig": "workspace:*",
     "rimraf": "^6.0.1",
     "tsup": "^8.2.4",
     "typescript": "^5.5.4",
-    "vitest": "^2.0.5",
-    "zerithdb-eslint-config": "workspace:*",
-    "zerithdb-tsconfig": "workspace:*"
+    "vitest": "^2.0.5"
   },
   "files": [
     "dist",
