@@ -13,14 +13,11 @@ interface KeyValueStorage {
 
 const memoryStorage = new Map<string, string>();
 
+import { env } from "zerithdb-core";
+
 function resolveStorage(): KeyValueStorage {
-  try {
-    if (typeof localStorage !== "undefined") {
-      return localStorage;
-    }
-  } catch {
-    // Ignore environments where localStorage exists but is inaccessible.
-  }
+  const local = env.getLocalStorage();
+  if (local) return local as unknown as KeyValueStorage;
 
   return {
     getItem(key: string): string | null {

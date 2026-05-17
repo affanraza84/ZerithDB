@@ -6,7 +6,7 @@ import type {
   MediaStreamKind,
   MediaStreamMetadata,
 } from "zerithdb-core";
-import { EventEmitter, ZerithDBError, ErrorCode } from "zerithdb-core";
+import { EventEmitter, ZerithDBError, ErrorCode, env } from "zerithdb-core";
 import type { AuthManager } from "zerithdb-auth";
 import type { SignalingTransport } from "./signaling-transport.js";
 import { WebSocketTransport } from "./transports/websocket-transport.js";
@@ -419,6 +419,7 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
     const peer = new SimplePeer({
       initiator,
       trickle: true,
+      wrtc: env.getWebRTC() as any,
       streams: [...this.localStreams.values()],
       config: {
         iceServers: this.config.sync?.iceServers ?? [

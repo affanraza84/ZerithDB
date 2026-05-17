@@ -5,6 +5,7 @@
 export { EventEmitter } from "./internal/event-emitter.js";
 export { ZerithDBError, ErrorCode } from "zerithdb-errors";
 export { Logger } from "./internal/logger.js";
+export * as env from "./internal/env.js";
 export type {
   ZerithDBConfig,
   SyncConfig,
