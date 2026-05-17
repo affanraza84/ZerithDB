@@ -5,6 +5,7 @@ import { initCommand } from "./commands/init.js";
 import { signalCommand } from "./commands/signal.js";
 import { maintenanceCommand } from "./commands/maintenance.js";
 import { checkConnectivity } from "./checkConnectivity.js";
+import { generateCommand } from "./commands/generate.js";
 
 const VERSION = "0.1.0";
 
@@ -45,6 +46,13 @@ async function main() {
     .description("Start a local WebSocket signaling server for development")
     .option("-p, --port <port>", "Port to listen on", "4000")
     .action(signalCommand);
+
+  program
+    .command("generate")
+    .description("Generate ZerithDB validation schemas from a Prisma schema")
+    .option("-s, --schema <schema>", "Path to schema.prisma file", "./prisma/schema.prisma")
+    .option("-o, --out <out>", "Path to output generated TypeScript file", "./src/zerith-schemas.ts")
+    .action(generateCommand);``
 
   program.parse(process.argv);
 }
