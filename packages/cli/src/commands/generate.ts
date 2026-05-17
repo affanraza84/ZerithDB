@@ -79,10 +79,8 @@ import { z } from "zod";
       if (!field.isRequired && !field.isId && !field.hasDefaultValue) {
          zodType = `${zodType}.optional()`;
       }
-      // If it's a relation field, we generally ignore or type as ID array/optional ID.
-      // For a simple validation schema generator, we'll map the actual scalars.
       if (field.kind === "object") {
-        continue; // Skip relations for simple validation
+        continue; 
       }
 
       fieldsCode += `  ${field.name}: ${zodType},\n`;
