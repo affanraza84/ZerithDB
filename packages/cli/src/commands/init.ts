@@ -4,7 +4,7 @@ import ora from "ora";
 import chalk from "chalk";
 import { execa } from "execa";
 import prompts from "prompts";
-import { writeFile } from "../utils/writeFile";
+import { writeFile } from "../utils/writeFile.js";
 
 const TEMPLATES: Record<string, string> = {
   todo: "todo-app",
@@ -98,7 +98,7 @@ export async function initCommand(
     // Cleanup: remove the directory if it's mostly empty (failed halfway)
     try {
       const files = await fs.readdir(targetDir);
-      if (files.length < 3) { 
+      if (files.length < 3) {
         await fs.rm(targetDir, { recursive: true, force: true });
         console.log(chalk.gray("Cleaned up incomplete project directory."));
       }
