@@ -36,7 +36,7 @@ describe("createApp", () => {
   });
 
   it("should throw an error if appId is missing", () => {
-    // @ts-expect-error - testing invalid config
+    // @ts-expect-error   ← ye karna hai
     expect(() => createApp({})).toThrow('createApp requires a non-empty "appId" in config');
   });
 
