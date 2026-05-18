@@ -42,9 +42,23 @@ export type InsertResult = {
   id: DocumentId;
 };
 
-export type QueryOptions = {
+export type QueryOptions<T extends Record<string, any> = Record<string, any>> = {
   limit?: number;
+
+  /**
+   * Number of matching documents to skip.
+   * `offset` is kept for backward compatibility.
+   */
+  skip?: number;
   offset?: number;
+
+  /**
+   * Sort matching documents by field.
+   */
+  sort?: {
+    field: keyof Document<T>;
+    order?: "asc" | "desc";
+  };
 };
 
 export type FindResult<T extends Record<string, any>> = {

@@ -109,31 +109,49 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
    * const high = await todos.find({ priority: { $gte: 3 } });
    * ```
    */
-  async find(filter: QueryFilter<T> = {}, options: QueryOptions = {}): Promise<Document<T>[]> {
+  async find(
+    filter: QueryFilter<T> = {},
+    options: QueryOptions<T> = {}
+  ): Promise<Document<T>[]> {
     return wrapIDBOperation(
       ErrorCode.DB_READ_FAILED,
       `Failed to query collection "${this.collectionName}"`,
       async () => {
         const compiledFilter = this.precompileRegexes(filter);
         const results: Document<T>[] = [];
-        let skipped = 0;
-        const offset = options.offset ?? 0;
+
+        await this.table.each((doc) => {
+          if (this.matchesFilter(doc, compiledFilter)) {
+            results.push(doc);
+          }
+        });
+
+        if (options.sort) {
+          const { field, order = "asc" } = options.sort;
+
+          results.sort((a, b) => {
+            const aValue = a[field];
+            const bValue = b[field];
+
+            if (aValue === bValue) return 0;
+
+            if (aValue == null) return 1;
+            if (bValue == null) return -1;
+
+            const comparison =
+              String(aValue).localeCompare(String(bValue), undefined, {
+                numeric: true,
+                sensitivity: "base",
+              });
+
+            return order === "desc" ? -comparison : comparison;
+          });
+        }
+
+        const skip = options.skip ?? options.offset ?? 0;
         const limit = options.limit ?? Number.POSITIVE_INFINITY;
 
-        await this.table
-          .toCollection()
-          .until(() => results.length >= limit)
-          .each((doc) => {
-            if (this.matchesFilter(doc, compiledFilter)) {
-              if (skipped < offset) {
-                skipped++;
-              } else {
-                results.push(doc);
-              }
-            }
-          });
-
-        return results;
+        return results.slice(skip, skip + limit);
       }
     );
   }
