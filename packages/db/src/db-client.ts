@@ -4,6 +4,7 @@ import type {
   ZerithDBConfig,
   Document,
   QueryFilter,
+  QueryOptions,
   InsertResult,
   UpdateSpec,
 } from "zerithdb-core";
@@ -108,14 +109,31 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
    * const high = await todos.find({ priority: { $gte: 3 } });
    * ```
    */
-  async find(filter: QueryFilter<T> = {}): Promise<Document<T>[]> {
+  async find(filter: QueryFilter<T> = {}, options: QueryOptions = {}): Promise<Document<T>[]> {
     return wrapIDBOperation(
       ErrorCode.DB_READ_FAILED,
       `Failed to query collection "${this.collectionName}"`,
       async () => {
-        const all = await this.table.toArray();
         const compiledFilter = this.precompileRegexes(filter);
-        return all.filter((doc) => this.matchesFilter(doc, compiledFilter));
+        const results: Document<T>[] = [];
+        let skipped = 0;
+        const offset = options.offset ?? 0;
+        const limit = options.limit ?? Number.POSITIVE_INFINITY;
+
+        await this.table
+          .toCollection()
+          .until(() => results.length >= limit)
+          .each((doc) => {
+            if (this.matchesFilter(doc, compiledFilter)) {
+              if (skipped < offset) {
+                skipped++;
+              } else {
+                results.push(doc);
+              }
+            }
+          });
+
+        return results;
       }
     );
   }
