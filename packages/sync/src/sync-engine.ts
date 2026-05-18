@@ -29,6 +29,7 @@ export class SyncEngine extends EventEmitter<SyncEvents> {
   readonly outbox: OutboxQueue<Uint8Array>;
   readonly inbox: InboxQueue<Uint8Array>;
   private _enabled = false;
+  
   private _state: SyncState = { synced: false, pendingUpdates: 0, connectedPeers: 0 };
   private plugins = new Map<string, SyncPlugin>();
   private activePluginVersion = 1;
@@ -163,13 +164,13 @@ export class SyncEngine extends EventEmitter<SyncEvents> {
       doc
     );
     this.persistences.set(collectionName, persistence);
+// Broadcast local updates to peers (batched via requestAnimationFrame)
+doc.on("update", (update: Uint8Array, origin: unknown) => {
+  if (origin === "remote") return; // Don't echo back remote updates
 
-    // Broadcast local updates to peers (batched via requestAnimationFrame)
-    doc.on("update", (update: Uint8Array, origin: unknown) => {
-      if (origin === "remote") return; // Don't echo back remote updates
-      // Always queue the update so it eventually reaches the outbox (even if offline)
-      this.queueUpdate(collectionName, update);
-    });
+  // Always queue the update so it eventually reaches the outbox (even if offline)
+  this.queueUpdate(collectionName, update);
+});
 
     this.docs.set(collectionName, doc);
     return doc;
